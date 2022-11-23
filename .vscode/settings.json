@@ -3,6 +3,7 @@
         "undefined-type"
     ],
     "robloxLsp.diagnostics.globals": [
-        "readfile"
+        "readfile",
+        "writefile"
     ]
 }

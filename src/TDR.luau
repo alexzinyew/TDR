@@ -2,9 +2,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 _G.TDR = {}
 local TDR:TDR = _G.TDR
 
-function TDR.runFeature(Feature:string) : Feature
+function TDR.runFeature(Feature:string,name:string,desc:string,...) : Feature
     local path = _G.PATH.."features/"..Feature..".luau"
-    return loadstring(readfile(path))().init()
+    return loadstring(readfile(path))().init(name,string,...)
 end
 
 function TDR.conCommand(name:string, callback, override:boolean)
@@ -28,16 +28,29 @@ function TDR.conCommand(name:string, callback, override:boolean)
     return Command
 end
 
+function TDR.conVar(name:string, default_value:string)
+    local Var : ConVar = {}
+    Var.name = name
+    Var.value = default_value
+
+    Var.getBool = function()
+        return Var.value == "true" or Var.value == "0" and true or false
+    end
+
+    return Var
+end
+
 function TDR.start()
     _G.PATH = "/TDR/src/"
-
-    TDR.runFeature("test_feature")
+    TDR.Features = {}
+    TDR.Features["record"] = TDR.runFeature("record","Demo recording","")
 end
 
 type TDR = {
     start:()->nil;
     runFeature:(Feature:string)->Feature;
-    conCommand:any; -- should be type (name:string,args:{string})->Command
+    conCommand:(name:string,callback:()->string,override:boolean)->Command;
+    ConVar:(name:string, default_value:string)->ConVar;
 }
 
 type Feature = {
@@ -48,8 +61,14 @@ type Feature = {
 
 type Command = {
     name:string;
-    callback:any; -- should be type (args:{string})->string
+    callback:(args)->string;
     obj:ModuleScript
+}
+
+type ConVar = {
+    name:string;
+    value:string;
+    getBool:()->boolean;
 }
 
 --reason for missing a bunch of typechecks for functions or tables is because synapse x sucks and cant handle them yet!!
