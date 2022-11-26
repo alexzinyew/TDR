@@ -21,7 +21,8 @@ function record.init(name:string,desc:string,...)
         Playing = false,
         DemoName="";
         Buffer = {};
-        onStop = Instance.new("BindableEvent")
+        onStop = Instance.new("BindableEvent");
+        Timescale = TDR.conVar("tdr_demo_timescale",{"1"})
     },record)
 
     TDR.conCommand("tdr_record",function(args)return self:Record(args) end,true)
@@ -139,13 +140,14 @@ function record:PlayDemo(demo,doCamera:boolean)
         stop = true
     end)
 
+    local timepassed = 0
     for i,Data in pairs(demo.PositionData) do
         if stop == true then break end
         local Position = Vector3.new(Data[1][1], Data[1][2], Data[1][3]) + ReplicatedStorage.Levels[Player.PlayerGui.CurrentLevel.Value].SpawnLocation.Position
         local Rot = Vector3.new(Data[2][1], Data[2][2], Data[2][3])
         local Look = Vector3.new(Data[3][1], Data[3][2], Data[3][3])
         local Crouched = Data[4]
-        
+
         model:PivotTo(CFrame.new(Position) * CFrame.Angles(math.rad(Rot.X),math.rad(Rot.Y),math.rad(Rot.Z)))
 
         if doCamera then
@@ -153,7 +155,12 @@ function record:PlayDemo(demo,doCamera:boolean)
             Player.Character:PivotTo(model:GetPivot())
             workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position) * CFrame.Angles(Look.X,Look.Y,Look.Z)
         end
-        task.wait()
+        local scale = tonumber(self.Timescale.value[1])
+        timepassed += (1/60) / (scale ~= nil and scale or 1)
+        if timepassed >= 1/60 then
+            task.wait(timepassed)
+            timepassed = 0
+        end
     end
     Player.PlayerGui.noclipEnabled.Value = false
     model:Destroy()
@@ -191,7 +198,7 @@ type Command = {
 
 type ConVar = {
     name:string;
-    value:string;
+    value:any; --{string}
     getBool:()->boolean;
 }
 

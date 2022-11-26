@@ -1,4 +1,7 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TextService = game:GetService("TextService")
+local TweenService = game:GetService("TweenService")
 _G.TDR = {}
 local TDR:TDR = _G.TDR
 
@@ -28,29 +31,39 @@ function TDR.conCommand(name:string, callback, override:boolean)
     return Command
 end
 
-function TDR.conVar(name:string, default_value:string)
+function TDR.conVar(name:string, default_value, desc:string) --default_value:{string}
     local Var : ConVar = {}
     Var.name = name
     Var.value = default_value
+    Var.desc = desc
+    Var.default_value = default_value
+    Var.onChanged = Instance.new("BindableEvent")
+    Var.command = TDR.conCommand(name,function(args)
+        Var.value = args
+        Var.onChanged:Fire()
+    end,true)
 
-    Var.getBool = function()
-        return Var.value == "true" or Var.value == "0" and true or false
+    Var.getBool = function(index)
+        return Var.value[index] == "true" or Var.value[index] == "0" and true or false
     end
-
+    
     return Var
 end
 
 function TDR.start()
     _G.PATH = "/TDR/src/"
     TDR.Features = {}
-    TDR.Features["record"] = TDR.runFeature("record","Demo recording","")
+
+    TDR.Features["bread"]  = TDR.runFeature("bread", "bread ui","")
+    TDR.Features["record"] = TDR.runFeature("record","Demos"   ,"")
+    TDR.Features["ghosts"] = TDR.runFeature("ghosts","ghosts"  ,"")
 end
 
 type TDR = {
     start:()->nil;
     runFeature:(Feature:string)->Feature;
     conCommand:(name:string,callback:()->string,override:boolean)->Command;
-    ConVar:(name:string, default_value:string)->ConVar;
+    conVar:(name:string, default_value:any)->ConVar;
 }
 
 type Feature = {
@@ -67,8 +80,12 @@ type Command = {
 
 type ConVar = {
     name:string;
-    value:string;
-    getBool:()->boolean;
+    value:any;
+    command:Command;
+    default_value:any;
+    desc:string;
+    getBool:(number)->boolean;
+    onChanged:BindableEvent;
 }
 
 --reason for missing a bunch of typechecks for functions or tables is because synapse x sucks and cant handle them yet!!

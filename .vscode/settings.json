@@ -4,6 +4,7 @@
     ],
     "robloxLsp.diagnostics.globals": [
         "readfile",
-        "writefile"
+        "writefile",
+        "syn"
     ]
 }
