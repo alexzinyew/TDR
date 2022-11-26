@@ -56,7 +56,7 @@ function TDR.start()
 
     TDR.Features["bread"]  = TDR.runFeature("bread", "bread ui","")
     TDR.Features["record"] = TDR.runFeature("record","Demos"   ,"")
-    TDR.Features["ghosts"] = TDR.runFeature("ghosts","ghosts"  ,"")
+    --TDR.Features["ghost"] = TDR.runFeature("ghost","ghosts"  ,"")
 end
 
 type TDR = {
