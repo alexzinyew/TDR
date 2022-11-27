@@ -31,6 +31,13 @@ function ghost.init()
         end
     end)
 
+    Players.PlayerRemoving:Connect(function()
+        if self.socket then
+            self.socket:Close()
+            self.socket = nil
+        end
+    end)
+
     self.ghostFolder.Name = "Ghosts"
 
     return self
@@ -113,7 +120,7 @@ function ghost:OnMessage(msg:string)
     local Mode = Data.Mode
     local User = Data.User
     local Data = Data.Data
-    if Mode == "Step" then
+    if Mode == "Step" and User ~= self:GetName() then
         local Ghost:Model = self.ghostFolder:FindFirstChild(User)
         if Ghost and Data.Map == Players.LocalPlayer.PlayerGui.CurrentLevel.Value then
             local PositionData = Data.PositionData
@@ -129,7 +136,6 @@ function ghost:OnMessage(msg:string)
         elseif not Ghost then
             local Ghost = self.sampleGhost:Clone()
             Ghost.Parent = self.ghostFolder
-            Ghost:PivotTo(CFrame.new(0,999,0))
             Ghost.Name = User
             local PositionData = Data.PositionData
             local Position = Vector3.new(unpack(PositionData.Position))

@@ -13,14 +13,16 @@ async def server(websocket,path):
             clients[websocket] = message["User"]
             if message["Mode"] == "Step" or message["Mode"] == "MapChange" or message["Mode"] == "Connect" or message["Mode"] == "Chat": #essentially replicate to all other clients
                 for socket,name in clients.items():
-                    if socket != websocket:
+                    if socket != websocket and socket.closed == False and name != clients[websocket]:
                         await socket.send(json.dumps(message))
-
+    except websockets.ConnectionClosedError:
+        pass
+    
     finally:
         print('disconnect')
         if websocket in clients:
             for socket,name in clients.items():
-                if socket != websocket:
+                if socket != websocket and socket.closed == False and name != clients[websocket]:
                     data = {"Mode": "Disconnect","User":clients[websocket],"Data":{}}
                     await socket.send(json.dumps(data))
 
