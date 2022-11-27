@@ -39,8 +39,16 @@ function TDR.conVar(name:string, default_value, desc:string) --default_value:{st
     Var.default_value = default_value
     Var.onChanged = Instance.new("BindableEvent")
     Var.command = TDR.conCommand(name,function(args)
-        Var.value = args
+        if #args == 0 then
+            local text = Var.value[1]
+            for i,v in pairs(Var.value) do if i ~= 1 then text = text.." "..v end end
+            text = text.." | Default Value: "..Var.default_value[1]
+            for i,v in pairs(Var.default_value) do if i ~= 1 then text = text.." "..v end end
+            return text
+        else
+            Var.value = args
         Var.onChanged:Fire()
+        end
     end,true)
 
     Var.getBool = function(index)
@@ -56,7 +64,7 @@ function TDR.start()
 
     TDR.Features["bread"]  = TDR.runFeature("bread", "bread ui","")
     TDR.Features["record"] = TDR.runFeature("record","Demos"   ,"")
-    --TDR.Features["ghost"] = TDR.runFeature("ghost","ghosts"  ,"")
+    TDR.Features["ghost"] = TDR.runFeature("ghost","ghosts"  ,"")
 end
 
 type TDR = {

@@ -30,8 +30,16 @@ function record.init(name:string,desc:string,...)
     TDR.conCommand("tdr_playdemo",function(args)return self:PlayCommand(args) end,true)
     TDR.conCommand("tdr_clear_onload_demos",function(args)return self:ClearOnLoad(args) end,true)
     TDR.conCommand("tdr_stop_demo",function(args)return self:StopDemo(args) end,true)
+    TDR.conCommand("tdr_listdemos",function()
+        local files = listfiles("TDR/demo/")
+        local returntext = ""
+        for i,v in pairs(files) do
+             if i == 1 then returntext = "\n"..string.gsub(v,"TDR/demo/","") else returntext = returntext.."\n"..string.gsub(v,"TDR/demo/","") end
+        end
+        return returntext
+    end,true)
 
-    while task.wait() do
+    RunService.RenderStepped:Connect(function()
         if self.Recording == true and Player.Character then
             local pos = LevelService:GetLevelPosition(Player.Character.PrimaryPart.Position)
             local rot = Player.Character.PrimaryPart.Rotation
@@ -43,7 +51,7 @@ function record.init(name:string,desc:string,...)
                 Player.Character.crouch.Value
             })
         end
-    end
+    end)
 
     Player.PlayerGui.CurrentLevel.Changed:Connect(function()
         self:Stop()
@@ -65,10 +73,10 @@ function record:Record(args)
     end
 
     self.Recording = true;
-    self.DemoName = args[1];
+    selfdemoName = args[1];
     self.Buffer = {}
     self.Map = Players.PlayerGui.CurrentLevel.Value
-    writefile("TDR/.demo/"..self.DemoName..".tdrdemo","")
+    writefile("TDR/demo/"..selfdemoName..".tdrdemo","")
 
     return "Recording!"
 end
@@ -78,14 +86,14 @@ function record:Stop()
         return "!DEVERROR!Not recording"
     end
 
-    local tmp = ""..self.DemoName;
-    writefile("TDR/.demo/"..self.DemoName..".tdrdemo",HttpService:JSONEncode({
+    local tmp = ""..selfdemoName;
+    writefile("TDR/demo/"..selfdemoName..".tdrdemo",HttpService:JSONEncode({
         User = Player.Name;
         Map = self.Map;
         PositionData = self.Buffer
     }))
     self.Recording = false;
-    self.DemoName = "";
+    selfdemoName = "";
     self.Buffer = {}
     self.Map = ""
     return "Stopped recording: "..tmp
@@ -99,7 +107,7 @@ function record:PlayCommand(args)
     end
     local demoName,onLoad = args[1],args[2]
 
-    local demo = HttpService:JSONDecode(readfile("TDR/.demo/"..demoName..".tdrdemo"))
+    local demo = HttpService:JSONDecode(readfile("TDR/demo/"..demoName..".tdrdemo"))
     if demo then
         if onLoad == "1" then
             self.onLoadDemo = demo

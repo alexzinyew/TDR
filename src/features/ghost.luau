@@ -5,12 +5,14 @@ local ghost = {}
 ghost.__index = ghost
 local TDR:TDR = _G.TDR
 
+local bread = TDR.Features["bread"]
+
 function ghost.init()
     local self:Feature = setmetatable({
         socket = nil;
         lastPacket = {};
         color = TDR.conVar("tdr_ghost_color",{"0","0","0"});
-        name = TDR.conVar("tdr_ghost_name",{Players.LocalPlayer.Name});
+        ghostFolder = Instance.new("Folder",workspace)
     },ghost)
 
     TDR.conCommand("tdr_ghost_connect",function(args)return self:Connect(args) end,true)
@@ -24,13 +26,26 @@ function ghost.init()
         self:SendMapChangePacket()
     end)
 
+    self.ghostFolder.Name = "Ghosts"
+
     return self
 end
 
 function ghost:GetName() : string
-    local a = ""
-    for _,v in pairs(self.name.value) do a = a.." "..v end
-    return a
+    return Players.LocalPlayer.Name
+end
+
+function ghost:SendConnectPacket()
+    if self.socket then
+        local packet = {
+            Mode = "Connect";
+            User = self:GetName();
+            Data = {}
+        }
+
+        self.socket:Send(HttpService:JSONEncode(packet))
+        self.lastPacket = packet
+    end
 end
 
 function ghost:SendMapChangePacket()
@@ -72,7 +87,35 @@ function ghost:SendSteppedPacket()
 end
 
 function ghost:OnMessage(msg:string)
-    print(msg)
+    local Data = HttpService:JSONDecode(msg)
+    local Mode = Data.Mode
+    local User = Data.User
+    local Data = Data.Data
+    if Mode == "Step" then
+        local Ghost:Model = self.ghostFolder:FindFirstChild(User)
+        if Ghost then
+            local PositionData = Data.PositionData
+            local Position = Vector3.new(PositionData.Position.X,PositionData.Position.Y,PositionData.Position.Z)
+            local Rotation = Vector3.new(PositionData.Rotation.X,PositionData.Rotation.Y,PositionData.Rotation.Z)
+            local Color = {PositionData.Color[1],PositionData.Color[2],PositionData.Color[3]}
+            Ghost:PivotTo(CFrame.new(Position) * CFrame.Angles(math.rad(Rotation.X),math.rad(Rotation.Y),math.rad(Rotation.Z)))
+            for i,v in pairs(Ghost:GetChildren()) do
+                if v:IsA("BasePart") then
+                    v.Color = Color
+                end
+            end
+        end
+    elseif Mode == "Disconnect" then
+        bread:CreateBread{User.." Has disconnected"}
+    elseif Mode == "Connect" then
+        bread:CreateBread{User.." Has Connected"}
+        local ghost:Model = game:GetObjects(getsynasset("TDR/src/misc/ghost.rbxm"))[1]
+        ghost.Parent = self.ghostFolder
+        ghost:PivotTo(CFrame.new(0,999,0))
+        ghost.Name = User
+    elseif Mode == "MapChange" then
+        bread:CreateBread{User.." Is now on "..Data.NewMap}
+    end
 end
 
 function ghost:OnClose()
@@ -101,6 +144,8 @@ function ghost:Connect(args)
         self:OnClose()
     end)
 
+    self:SendConnectPacket()
+    bread:CreateBread{"Connected to ghost server!"}
     return "Connected!"
 end
 
@@ -111,6 +156,7 @@ function ghost:Disconnect()
     else
         return "!DEVERROR!Not connected to a ghost server"
     end
+    bread:CreateBread{"Disconnected from ghost server!"}
     return "Disconnected!"
 end
 
