@@ -4,7 +4,6 @@ qol.__index = qol
 
 function qol.init()
     local self:Feature = setmetatable({},qol)
-    print("!")
 
     TDR.conCommand("tdr_qol_setangle",function(args)return self:setangle(args) end)
     TDR.conCommand("qol_setangle",function(args)return self:setangle(args) end)
@@ -15,7 +14,7 @@ function qol.init()
     return self
 end
 
-function qol.setangle(Arguments)
+function qol:setangle(Arguments)
     if #Arguments ~= 3 then
         return "!DEVERROR!Provide 3 XYZ values"         
     else
@@ -25,7 +24,7 @@ function qol.setangle(Arguments)
     end
 end
 
-function qol.setposition(Arguments)
+function qol:setposition(Arguments)
     if #Arguments ~= 3 then
         return "!DEVERROR!Provide 3 XYZ values"         
     else
@@ -38,4 +37,3 @@ function qol.setposition(Arguments)
 end
 
 return qol
-
