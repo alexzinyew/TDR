@@ -61,7 +61,7 @@ function ghost:Chat(args)
 
         self.socket:Send(HttpService:JSONEncode(packet))
         self.lastPacket = packet
-        bread:CreateBread{game.Players.GetChildren().name..": "..message}
+        bread:CreateBread{self.GetName()..": "..message}
     end
 end
 
