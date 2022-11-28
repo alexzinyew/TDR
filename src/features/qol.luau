@@ -5,12 +5,12 @@ qol.__index = qol
 function qol.init()
     local self:Feature = setmetatable(qol,{})
     print("!")
-
+    
     TDR.conCommand("tdr_qol_setangle",function(args)return self:setangle(args) end)
     TDR.conCommand("qol_setangle",function(args)return self:setangle(args) end)
     TDR.conCommand("tdr_qol_setposition",function(args)return self:setposition(args) end)
     TDR.conCommand("qol_setposition",function(args)return self:setposition(args) end)
-    end)
+
 
     return self
 end
