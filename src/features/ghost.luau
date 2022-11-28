@@ -19,6 +19,7 @@ function ghost.init()
     TDR.conCommand("tdr_ghost_connect",function(args)return self:Connect(args) end,true)
     TDR.conCommand("tdr_ghost_disconnect",function(args)return self:Disconnect(args) end,true)
     TDR.conCommand("tdr_ghost_chat",function(args)return self:Chat(args)end)
+    TDR.conCommand("ch",function(args)return self:Chat(args)end)
 
     RunService.RenderStepped:Connect(function(deltaTime)
         self:SendSteppedPacket()
@@ -60,6 +61,7 @@ function ghost:Chat(args)
 
         self.socket:Send(HttpService:JSONEncode(packet))
         self.lastPacket = packet
+        bread:CreateBread{game.Players.GetChildren().name..": "..message}
     end
 end
 
