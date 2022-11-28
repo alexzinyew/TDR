@@ -61,7 +61,7 @@ function ghost:Chat(args)
 
         self.socket:Send(HttpService:JSONEncode(packet))
         self.lastPacket = packet
-        bread:CreateBread{self.GetName()..": "..message}
+        bread:CreateBread{self:GetName()..": "..message}
     end
 end
 
@@ -128,7 +128,7 @@ function ghost:OnMessage(msg:string)
             local Ghost = self.sampleGhost:Clone()
             Ghost.Parent = self.ghostFolder
             Ghost.Name = User
-            Ghost.BillboardGui.Textlabel.Text = User
+            Ghost.BillboardGui.TextLabel.Text = User
         end
         if Ghost and Data.Map == Players.LocalPlayer.PlayerGui.CurrentLevel.Value then
             local PositionData = Data.PositionData
@@ -141,7 +141,7 @@ function ghost:OnMessage(msg:string)
                     v.Color = Color
                 end
             end
-            Ghost.BillboardGui.Textlabel.TextColor3 = Color
+            Ghost.BillboardGui.TextLabel.TextColor3 = Color
         end
     elseif Mode == "Disconnect" then
         bread:CreateBread{User.." Has disconnected"}
