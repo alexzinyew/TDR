@@ -5,7 +5,7 @@ qol.__index = qol
 function qol.init()
     local self:Feature = setmetatable(qol,{})
     print("!")
-    
+
     TDR.conCommand("tdr_qol_setangle",function(args)return self:setangle(args) end)
     TDR.conCommand("qol_setangle",function(args)return self:setangle(args) end)
     TDR.conCommand("tdr_qol_setposition",function(args)return self:setposition(args) end)
@@ -14,6 +14,8 @@ function qol.init()
 
     return self
 end
+
+-- TODO - Diagonose why arguments arent transferring
 
 function qol.setangle(Arguments)
     if #Arguments ~= 3 then
@@ -38,3 +40,4 @@ function qol.setposition(Arguments)
 end
 
 return qol
+
