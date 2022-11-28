@@ -164,6 +164,7 @@ end
 
 function ghost:OnClose()
     self.socket = nil
+    self.ghostFolder:ClearAllChildren()
 end
 
 function ghost:Connect(args)
@@ -201,6 +202,7 @@ function ghost:Disconnect()
         return "!DEVERROR!Not connected to a ghost server"
     end
     bread:CreateBread{"Disconnected from ghost server!"}
+    self.ghostFolder:ClearAllChildren()
     return "Disconnected!"
 end
 
