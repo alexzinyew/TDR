@@ -122,6 +122,12 @@ function ghost:OnMessage(msg:string)
     local Data = Data.Data
     if Mode == "Step" and User ~= self:GetName() then
         local Ghost:Model = self.ghostFolder:FindFirstChild(User)
+        if not Ghost then
+            local Ghost = self.sampleGhost:Clone()
+            Ghost.Parent = self.ghostFolder
+            Ghost.Name = User
+            Ghost.BillboardGui.Textlabel.Text = User
+        end
         if Ghost and Data.Map == Players.LocalPlayer.PlayerGui.CurrentLevel.Value then
             local PositionData = Data.PositionData
             local Position = Vector3.new(unpack(PositionData.Position))
@@ -133,20 +139,7 @@ function ghost:OnMessage(msg:string)
                     v.Color = Color
                 end
             end
-        elseif not Ghost then
-            local Ghost = self.sampleGhost:Clone()
-            Ghost.Parent = self.ghostFolder
-            Ghost.Name = User
-            local PositionData = Data.PositionData
-            local Position = Vector3.new(unpack(PositionData.Position))
-            local Rotation = Vector3.new(unpack(PositionData.Rotation))
-            local Color = Color3.fromRGB(unpack(PositionData.Color))
-            Ghost:PivotTo(CFrame.new(Position) * CFrame.Angles(math.rad(Rotation.X),math.rad(Rotation.Y),math.rad(Rotation.Z)))
-            for i,v in pairs(Ghost:GetChildren()) do
-                if v:IsA("BasePart") then
-                    v.Color = Color
-                end
-            end
+            Ghost.BillboardGui.Textlabel.TextColor3 = Color
         end
     elseif Mode == "Disconnect" then
         bread:CreateBread{User.." Has disconnected"}
