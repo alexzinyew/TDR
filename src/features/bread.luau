@@ -35,8 +35,8 @@ end
 function bread:CreateBread(args)
     local self:Feature = self
     task.spawn(function()
-        local text = ""
-        for i,v in pairs(args) do text = text.." "..v end
+        local text = args[1] or ""
+        for i,v in pairs(args) do if i ~= 1 then text = text.." "..v end end
         local bread : TextLabel = TDR.BreadUi.Frame.sample:Clone()
 
         bread.Parent = TDR.BreadUi.Frame
